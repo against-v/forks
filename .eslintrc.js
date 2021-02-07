@@ -11,7 +11,16 @@ module.exports = {
     parser: 'babel-eslint'
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
-  }
-}
+    "comma-dangle": ["error", "always-multiline"],
+    quotes: ["warn", "double"],
+    semi: ["error", "always"],
+    "space-before-function-paren": ["error", "never"],
+    "object-curly-spacing": ["error", "never"],
+    "spaced-comment": ["off"],
+    "no-useless-return": ["off"],
+    "quote-props": ["off"],
+    "dot-notation": ["off"],
+    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
+  },
+};
