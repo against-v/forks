@@ -14,13 +14,14 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    getForksCount({commit}, payload) {
+      return api.get(`repos/${payload.owner}/${payload.repo}`, {params: payload}).then(res => {
+        return res.data.forks_count;
+      });
+    },
     getForks({commit}, payload) {
-      const owner = payload.owner;
-      const repo = payload.repo;
-      console.log(payload);
-      return api.get(`repos/${owner}/${repo}`, {params: payload}).then(res => {
-        console.log(res);
-        commit("setForks", res.data);
+      return api.get(`repos/${payload.owner}/${payload.repo}/forks`, {params: payload}).then(res => {
+        return res.data;
       });
     },
   },
