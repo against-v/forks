@@ -6,25 +6,41 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    repo: null,
     forks: [],
   },
   mutations: {
-    setForks(state, data) {
-      state.forks = data;
+    setRepo(state, payload) {
+      state.repo = payload;
+    },
+    setForks(state, payload) {
+      state.forks = payload;
     },
   },
   actions: {
-    getForksCount({commit}, payload) {
+    getRepo({commit}, payload) {
       return api.get(`repos/${payload.owner}/${payload.repo}`, {params: payload}).then(res => {
-        return res.data.forks_count;
+        commit("setRepo", res.data);
       });
     },
     getForks({commit}, payload) {
       return api.get(`repos/${payload.owner}/${payload.repo}/forks`, {params: payload}).then(res => {
-        return res.data;
+        commit("setForks", res.data);
       });
     },
   },
-  modules: {
+  getters: {
+    repoName: (state) => {
+      return state.repo.name;
+    },
+    ownerLogin: (state) => {
+      return state.repo.owner.login;
+    },
+    forksCount: (state) => {
+      return state.repo.forks_count;
+    },
+    forks: (state) => {
+      return state.forks;
+    },
   },
 });

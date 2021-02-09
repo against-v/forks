@@ -17,13 +17,8 @@ export default {
     return {
       value: "",
       valueAsArray: [],
-      adaptedValue: "",
-      params: {
-        owner: "",
-        repo: "",
-        per_page: 10,
-        page: 1,
-      },
+      repo: "",
+      owner: "",
     };
   },
   methods: {
@@ -31,8 +26,8 @@ export default {
       this.valueAsArray = this.value.split("/");
 
       if (this.validation(this.valueAsArray)) {
-        console.log("valid");
-        this.setParams();
+        this.owner = this.valueAsArray[0];
+        this.repo = this.valueAsArray[1];
         this.getData();
       } else {
         console.log("not valid");
@@ -41,19 +36,13 @@ export default {
     validation(val) {
       return val.length === 2;
     },
-    setParams() {
-      this.params.owner = this.valueAsArray[0];
-      this.params.repo = this.valueAsArray[1];
-    },
     async getData() {
       try {
-        const forksCount = await this.$store.dispatch("getForksCount", {
-          owner: this.params.owner,
-          repo: this.params.repo,
+        await this.$store.dispatch("getRepo", {
+          owner: this.owner,
+          repo: this.repo,
         });
-        const forks = await this.$store.dispatch("getForks", this.params);
-        console.log(forksCount);
-        console.log(forks);
+        this.$emit("request-completed");
       } catch (err) {
         console.error(err);
       }
