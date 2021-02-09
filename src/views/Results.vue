@@ -1,23 +1,43 @@
 <template>
   <div class="results">
     <h1>Results</h1>
-    <search-panel>
-    </search-panel>
-    <results-table
-      :data="tableData"
-    ></results-table>
+    <search-panel></search-panel>
+    <div class="results">
+      <div class="results__table">
+        <results-table :data="tableData"></results-table>
+      </div>
+      <div class="results__pagination">
+        <paginate
+          :page-count="pageCount"
+          :click-handler="changePage"
+          :prev-text="'Предыдущая страница'"
+          :next-text="'Следующая страница'"
+          :container-class="'paginator'"
+        ></paginate>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
+import Paginate from "vuejs-paginate";
 import SearchPanel from "@/components/search-panel";
 import ResultsTable from "@/components/results-table";
 export default {
   name: "Results",
-  components: {ResultsTable, SearchPanel},
+  components: {ResultsTable, SearchPanel, Paginate},
+  data() {
+    return {
+      perPage: 2,
+    };
+  },
   computed: {
     query() {
       return this.$route.query;
+    },
+    pageCount() {
+      return Math.ceil(this.query.forksCount / this.perPage);
     },
     forks() {
       return this.$store.getters.forks;
@@ -50,10 +70,20 @@ export default {
           owner: this.query.owner,
           repo: this.query.repo,
           page: this.query.page,
-          per_page: 10,
+          per_page: this.perPage,
         });
       } catch (err) {
         console.error(err);
+      }
+    },
+    async changePage(pageNumber) {
+      const query = {...this.query};
+      query.page = pageNumber;
+      try {
+        await this.$router.replace({query});
+        await this.getData();
+      } catch (err) {
+        console.log(err);
       }
     },
   },
@@ -61,7 +91,7 @@ export default {
     if (this.checkQuery()) {
       this.getData();
     } else {
-      this.$router.replace({"query": null});
+      this.$router.replace({query: null});
     }
   },
 };
