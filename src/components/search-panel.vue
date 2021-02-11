@@ -1,12 +1,26 @@
 <template>
-  <div>
-    <input
-      type="text"
-      v-model="value"
+  <div class="search">
+    <div class="search__container">
+      <input
+        class="search__input"
+        type="text"
+        v-model="value"
+        placeholder="vuejs/vue"
+        @input="showValidateError = false"
+      >
+      <button
+        class="search__button"
+        :class="{'preload':preload}"
+        :disabled="preload"
+        @click.prevent="onClickButton"
+      >Найти</button>
+    </div>
+    <p
+      v-show="showValidateError"
+      class="search__error"
     >
-    <button
-      @click.prevent="onClickButton"
-    >Search</button>
+      {{validateError}}
+    </p>
   </div>
 </template>
 
@@ -19,18 +33,22 @@ export default {
       valueAsArray: [],
       repo: "",
       owner: "",
+      validateError: "Неправильный формат названия репозитория",
+      showValidateError: false,
+      preload: false,
     };
   },
   methods: {
     onClickButton() {
+      this.preload = true;
       this.valueAsArray = this.value.split("/");
-
       if (this.validation(this.valueAsArray)) {
         this.owner = this.valueAsArray[0];
         this.repo = this.valueAsArray[1];
         this.getData();
       } else {
-        console.log("not valid");
+        this.showValidateError = true;
+        this.preload = false;
       }
     },
     validation(val) {
@@ -43,8 +61,9 @@ export default {
           repo: this.repo,
         });
         this.$emit("request-completed");
+        this.preload = false;
       } catch (err) {
-        console.error(err);
+        this.preload = false;
       }
     },
   },

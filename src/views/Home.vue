@@ -1,10 +1,12 @@
 <template>
-  <div class="home">
-    <h1>Home</h1>
-    <search-panel
-    @request-completed="showResults"
-    >
-    </search-panel>
+  <div class="home container">
+    <div class="home__title">
+      <h1 class="title">Поиск форков у репозитория</h1>
+      <p class="subtitle">Введите в поисковую строку название репозитория в формате <b>:owner/:repositoryName</b>, нажмите поиск и получите результат!</p>
+    </div>
+    <div class="home__search">
+      <search-panel @request-completed="showResults"></search-panel>
+    </div>
   </div>
 </template>
 

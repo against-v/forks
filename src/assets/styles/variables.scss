@@ -1,0 +1,27 @@
+$color-turquoise: #1D7373;
+$color-white: #fff;
+$color-blue: #3CA0D0;
+$color-grey: #828282;
+$color-black: #000;
+$color-red: #f00;
+
+$color-main: $color-turquoise;
+$color-secondary: $color-blue;
+$color-line: $color-grey;
+
+$font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+
+@mixin hidden-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+@keyframes rotation {
+  from {transform: rotate(0deg)}
+  to {transform: rotate(360deg)}
+}
