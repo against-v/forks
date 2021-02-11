@@ -1,13 +1,17 @@
 <template>
-  <div class="results">
-    <h1>Results</h1>
-    <search-panel></search-panel>
-    <div class="results">
+  <div class="results-page container">
+    <div class="results-page__search">
+      <search-panel
+      :preset-value="searchValue"
+      ></search-panel>
+    </div>
+    <div class="results-page__content results">
       <div class="results__table">
         <results-table :data="tableData"></results-table>
       </div>
       <div class="results__pagination">
         <paginate
+          v-if="pageCount > 0"
           :page-count="pageCount"
           :click-handler="changePage"
           :prev-text="'Предыдущая страница'"
@@ -29,26 +33,33 @@ export default {
   components: {ResultsTable, SearchPanel, Paginate},
   data() {
     return {
-      perPage: 2,
+      perPage: 10,
+      pageCount: 0,
+      searchValue: "",
     };
   },
   computed: {
     query() {
       return this.$route.query;
     },
-    pageCount() {
-      return Math.ceil(this.query.forksCount / this.perPage);
-    },
     forks() {
       return this.$store.getters.forks;
+    },
+    favList() {
+      console.log(this.$store.getters.favList);
+      return this.$store.getters.favList;
     },
     tableData() {
       return this.forks.map((item) => {
         return {
+          id: item.id,
           name: item.full_name,
           owner: item.owner.login,
           stars: item.stargazers_count,
           url: item.url,
+          isFavorite: Boolean(this.favList.find(i => {
+            return i === item.id;
+          })),
         };
       });
     },
@@ -77,6 +88,7 @@ export default {
       }
     },
     async changePage(pageNumber) {
+      this.$store.commit("clearForks");
       const query = {...this.query};
       query.page = pageNumber;
       try {
@@ -89,6 +101,8 @@ export default {
   },
   created() {
     if (this.checkQuery()) {
+      this.pageCount = Math.ceil(this.query.forksCount / this.perPage);
+      this.searchValue = `${this.query.owner}/${this.query.repo}`;
       this.getData();
     } else {
       this.$router.replace({query: null});

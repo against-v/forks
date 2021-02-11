@@ -1,0 +1,18 @@
+.table-wrapper {
+  overflow-x: auto;
+}
+.table {
+  border: 1px solid $color-line;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 18px;
+}
+.table__th, .table__td {
+  border: 1px solid $color-line;
+  padding: 4px;
+  text-align: left;
+}
+.table__link {
+  text-decoration: none;
+  color: $color-blue;
+}

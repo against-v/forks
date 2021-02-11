@@ -38,6 +38,12 @@ export default {
       preload: false,
     };
   },
+  props: {
+    presetValue: {
+      type: String,
+      default: "",
+    },
+  },
   methods: {
     onClickButton() {
       this.preload = true;
@@ -61,11 +67,13 @@ export default {
           repo: this.repo,
         });
         this.$emit("request-completed");
-        this.preload = false;
       } catch (err) {
         this.preload = false;
       }
     },
+  },
+  created() {
+    this.value = this.presetValue;
   },
 };
 </script>
