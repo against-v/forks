@@ -31,7 +31,6 @@
           </a>
         </td>
         <td class="table__td">
-          {{item.isFavorite}}
           <button-fav
             :id="item.id"
             :preset-value="item.isFavorite"

@@ -1,5 +1,9 @@
 <template>
   <div class="results-page container">
+    <div
+      class="results-page__preloader"
+      v-show="showPreload"
+    ></div>
     <div class="results-page__search">
       <search-panel
       :preset-value="searchValue"
@@ -12,6 +16,7 @@
       <div class="results__pagination">
         <paginate
           v-if="pageCount > 0"
+          v-model="pageNum"
           :page-count="pageCount"
           :click-handler="changePage"
           :prev-text="'Предыдущая страница'"
@@ -35,7 +40,9 @@ export default {
     return {
       perPage: 10,
       pageCount: 0,
+      pageNum: 1,
       searchValue: "",
+      showPreload: true,
     };
   },
   computed: {
@@ -46,7 +53,6 @@ export default {
       return this.$store.getters.forks;
     },
     favList() {
-      console.log(this.$store.getters.favList);
       return this.$store.getters.favList;
     },
     tableData() {
@@ -83,11 +89,14 @@ export default {
           page: this.query.page,
           per_page: this.perPage,
         });
+        this.showPreload = false;
       } catch (err) {
         console.error(err);
+        this.showPreload = false;
       }
     },
     async changePage(pageNumber) {
+      this.showPreload = true;
       this.$store.commit("clearForks");
       const query = {...this.query};
       query.page = pageNumber;
@@ -103,6 +112,7 @@ export default {
     if (this.checkQuery()) {
       this.pageCount = Math.ceil(this.query.forksCount / this.perPage);
       this.searchValue = `${this.query.owner}/${this.query.repo}`;
+      this.pageNum = Number(this.query.page);
       this.getData();
     } else {
       this.$router.replace({query: null});

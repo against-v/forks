@@ -107,6 +107,28 @@ body {
   display: flex;
   justify-content: center;
 }
+.results-page__preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $color-white;
+  z-index: 1;
+  &::after {
+    content: "";
+    display: block;
+    border: 4px solid $color-main;
+    border-left-color: transparent;
+    border-radius: 50%;
+    animation: rotation 1s linear infinite;
+    width: 120px;
+    height: 120px;
+    position: absolute;
+    top: calc(50% - 60px);
+    left: calc(50% - 60px);
+  }
+}
 
 @media screen and (max-width: 768px) {
   .footer__copyright {
