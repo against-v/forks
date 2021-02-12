@@ -7,15 +7,25 @@
     <div class="results-page__search">
       <search-panel
       :preset-value="searchValue"
+      @on-error="showError"
+      @request-completed="showResults"
       ></search-panel>
     </div>
     <div class="results-page__content results">
-      <div class="results__table">
+      <p
+        v-if="!tableData.length"
+        class="results__message"
+        :class="{'error' : error}"
+      >{{message}}</p>
+      <div
+        v-if="tableData.length"
+        class="results__table"
+      >
         <results-table :data="tableData"></results-table>
       </div>
       <div class="results__pagination">
         <paginate
-          v-if="pageCount > 0"
+          v-if="tableData.length && pageCount > 0"
           v-model="pageNum"
           :page-count="pageCount"
           :click-handler="changePage"
@@ -43,17 +53,21 @@ export default {
       pageNum: 1,
       searchValue: "",
       showPreload: true,
+      emptyMessage: "Ничего не найдено!",
+      message: "",
+      error: false,
+      query: null,
     };
   },
   computed: {
-    query() {
-      return this.$route.query;
-    },
     forks() {
       return this.$store.getters.forks;
     },
     favList() {
       return this.$store.getters.favList;
+    },
+    searchRequest() {
+      return this.$store.getters.searchRequest;
     },
     tableData() {
       return this.forks.map((item) => {
@@ -78,41 +92,58 @@ export default {
         "page",
         "repo",
       ];
-      const missingQuery = requiredQueries.find((item) => !this.query[item]);
+      const missingQuery = requiredQueries.find((item) => !this.$route.query[item]);
       return !missingQuery;
     },
     async getData() {
+      this.$store.commit("clearForks");
       try {
         await this.$store.dispatch("getForks", {
-          owner: this.query.owner,
-          repo: this.query.repo,
-          page: this.query.page,
+          owner: this.$route.query.owner,
+          repo: this.$route.query.repo,
+          page: this.$route.query.page,
           per_page: this.perPage,
         });
         this.showPreload = false;
       } catch (err) {
-        console.error(err);
+        this.error = true;
+        this.message = `Ошибка: ${err.message}`;
         this.showPreload = false;
       }
     },
     async changePage(pageNumber) {
       this.showPreload = true;
-      this.$store.commit("clearForks");
-      const query = {...this.query};
+      const query = {...this.$route.query};
       query.page = pageNumber;
-      try {
-        await this.$router.replace({query});
-        await this.getData();
-      } catch (err) {
-        console.log(err);
-      }
+      await this.$router.replace({query});
+      await this.getData();
+    },
+    showError(err) {
+      this.error = true;
+      this.message = `Ошибка: ${err.message}`;
+    },
+    showResults() {
+      this.error = false;
+      this.message = this.emptyMessage;
+      this.$router.replace({
+        query: {
+          page: 1,
+          forksCount: String(this.$store.getters.forksCount),
+          repo: String(this.$store.getters.repoName),
+          owner: String(this.$store.getters.ownerLogin),
+        },
+      });
+      this.pageCount = Math.ceil(this.$route.query.forksCount / this.perPage);
+      this.pageNum = Number(this.$route.query.page);
+      this.getData();
     },
   },
   created() {
+    this.message = this.emptyMessage;
     if (this.checkQuery()) {
-      this.pageCount = Math.ceil(this.query.forksCount / this.perPage);
-      this.searchValue = `${this.query.owner}/${this.query.repo}`;
-      this.pageNum = Number(this.query.page);
+      this.pageCount = Math.ceil(this.$route.query.forksCount / this.perPage);
+      this.searchValue = this.searchRequest;
+      this.pageNum = Number(this.$route.query.page);
       this.getData();
     } else {
       this.$router.replace({query: null});

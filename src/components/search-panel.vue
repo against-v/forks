@@ -51,6 +51,7 @@ export default {
       if (this.validation(this.valueAsArray)) {
         this.owner = this.valueAsArray[0];
         this.repo = this.valueAsArray[1];
+        this.$store.commit("setSearchRequest", this.value);
         this.getData();
       } else {
         this.showValidateError = true;
@@ -66,9 +67,11 @@ export default {
           owner: this.owner,
           repo: this.repo,
         });
+        this.preload = false;
         this.$emit("request-completed");
       } catch (err) {
         this.preload = false;
+        this.$emit("on-error", err.response.data);
       }
     },
   },

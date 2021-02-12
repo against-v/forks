@@ -5,7 +5,10 @@
       <p class="subtitle">Введите в поисковую строку название репозитория в формате <b>:owner/:repositoryName</b>, нажмите поиск и получите результат!</p>
     </div>
     <div class="home__search">
-      <search-panel @request-completed="showResults"></search-panel>
+      <search-panel
+        @request-completed="showResults"
+        @on-error="showResults"
+      ></search-panel>
     </div>
   </div>
 </template>

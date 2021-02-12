@@ -9,6 +9,7 @@ export default new Vuex.Store({
     repo: null,
     forks: [],
     favList: JSON.parse(localStorage.getItem("favList")) || [],
+    searchRequest: "",
   },
   mutations: {
     setRepo(state, payload) {
@@ -32,11 +33,16 @@ export default new Vuex.Store({
     clearForks(state) {
       state.forks = [];
     },
+    setSearchRequest(state, payload) {
+      state.searchRequest = payload;
+    },
   },
   actions: {
     getRepo({commit}, payload) {
       return api.get(`repos/${payload.owner}/${payload.repo}`, {params: payload}).then(res => {
         commit("setRepo", res.data);
+      }).catch(() => {
+        commit("setRepo", null);
       });
     },
     getForks({commit}, payload) {
@@ -45,31 +51,32 @@ export default new Vuex.Store({
       });
     },
     addToFavList({commit}, payload) {
-      console.log(payload);
       commit("addToFavList", payload);
       commit("updateFavList", payload);
     },
     removeFromFavList({commit}, payload) {
-      console.log(payload);
       commit("removeFromFavList", payload);
       commit("updateFavList", payload);
     },
   },
   getters: {
     repoName: (state) => {
-      return state.repo.name;
+      return state.repo?.name || null;
     },
     ownerLogin: (state) => {
-      return state.repo.owner.login;
+      return state.repo?.owner.login || null;
     },
     forksCount: (state) => {
-      return state.repo.forks_count;
+      return state.repo?.forks_count || null;
     },
     forks: (state) => {
       return state.forks;
     },
     favList: (state) => {
       return state.favList;
+    },
+    searchRequest: (state) => {
+      return state.searchRequest;
     },
   },
 });
