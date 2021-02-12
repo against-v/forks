@@ -21,9 +21,9 @@ export default {
         name: "Results",
         query: {
           page: 1,
-          forksCount: this.$store.getters.forksCount,
-          repo: this.$store.getters.repoName,
-          owner: this.$store.getters.ownerLogin,
+          forksCount: String(this.$store.getters.forksCount),
+          repo: String(this.$store.getters.repoName),
+          owner: String(this.$store.getters.ownerLogin),
         },
       });
     },

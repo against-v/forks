@@ -129,6 +129,13 @@ body {
     left: calc(50% - 60px);
   }
 }
+.results__message {
+  text-align: center;
+  font-size: 18px;
+  &.error {
+    color: $color-red;
+  }
+}
 
 @media screen and (max-width: 768px) {
   .footer__copyright {
