@@ -1,27 +1,17 @@
-<template>
-  <div class="search">
-    <div class="search__container">
-      <input
-        class="search__input"
-        type="text"
-        v-model="value"
-        placeholder="vuejs/vue"
-        @input="showValidateError = false"
-      >
-      <button
-        class="search__button"
+<template lang="pug">
+  form.search
+    .search__container
+      input.search__input(
+      type="text"
+      v-model="value"
+      placeholder="vuejs/vue"
+      )
+      button.search__button(
         :class="{'preload':preload}"
-        :disabled="preload"
+        :disabled="preload || !isValid"
+        :title="buttonTitle"
         @click.prevent="onClickButton"
-      >Найти</button>
-    </div>
-    <p
-      v-show="showValidateError"
-      class="search__error"
-    >
-      {{validateError}}
-    </p>
-  </div>
+      ) Найти
 </template>
 
 <script>
@@ -30,11 +20,6 @@ export default {
   data() {
     return {
       value: "",
-      valueAsArray: [],
-      repo: "",
-      owner: "",
-      validateError: "Неправильный формат названия репозитория",
-      showValidateError: false,
       preload: false,
     };
   },
@@ -44,35 +29,32 @@ export default {
       default: "",
     },
   },
+  computed: {
+    values() {
+      return this.value.split("/");
+    },
+    isValid() {
+      return this.values.length === 2;
+    },
+    buttonTitle() {
+      return this.isValid ? "" : "Имя репозитория не соответствует требованиям";
+    },
+  },
   methods: {
     onClickButton() {
       this.preload = true;
-      this.valueAsArray = this.value.split("/");
-      if (this.validation(this.valueAsArray)) {
-        this.owner = this.valueAsArray[0];
-        this.repo = this.valueAsArray[1];
-        this.$store.commit("setSearchRequest", this.value);
-        this.getData();
-      } else {
-        this.showValidateError = true;
-        this.preload = false;
-      }
-    },
-    validation(val) {
-      return val.length === 2;
+
+      this.$store.commit("setSearchRequest", this.value);
+
+      this.getData();
     },
     async getData() {
-      try {
-        await this.$store.dispatch("getRepo", {
-          owner: this.owner,
-          repo: this.repo,
-        });
-        this.preload = false;
-        this.$emit("request-completed");
-      } catch (err) {
-        this.preload = false;
-        this.$emit("on-error", err.response.data);
-      }
+      await this.$store.dispatch("getRepo", {
+        owner: this.values[0],
+        repo: this.values[1],
+      });
+      this.preload = false;
+      this.$emit("request-completed");
     },
   },
   created() {

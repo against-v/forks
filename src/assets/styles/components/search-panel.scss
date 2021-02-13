@@ -23,9 +23,12 @@
   margin-left: 10px;
   cursor: pointer;
   position: relative;
+  &[disabled] {
+    opacity: .5;
+    cursor: default;
+  }
   &.preload {
     color: transparent;
-    pointer-events: none;
     &::after {
       content: "";
       display: block;
@@ -40,6 +43,7 @@
       animation: rotation linear 1s infinite;
     }
   }
+
 }
 .search__error {
   font-size: 14px;
