@@ -23,6 +23,9 @@ body {
 }
 .page__main {
   margin-bottom: auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 .page__footer {
   margin-top: 40px;
@@ -95,19 +98,26 @@ body {
   text-align: center;
   max-width: 600px;
 }
-.home__search, .results-page__search {
+.home__search, .results__search {
   margin-top: 20px;
   display: flex;
   justify-content: center;
 }
-.results-page__content {
+
+.results {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.results__content {
   margin-top: 20px;
+  flex-grow: 1;
 }
 .results__pagination {
   display: flex;
   justify-content: center;
 }
-.results-page__preloader {
+.results__preloader {
   position: fixed;
   top: 0;
   left: 0;
