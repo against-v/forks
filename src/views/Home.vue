@@ -1,16 +1,13 @@
-<template>
-  <div class="home container">
-    <div class="home__title">
-      <h1 class="title">Поиск форков у репозитория</h1>
-      <p class="subtitle">Введите в поисковую строку название репозитория в формате <b>:owner/:repositoryName</b>, нажмите поиск и получите результат!</p>
-    </div>
-    <div class="home__search">
-      <search-panel
+<template lang="pug">
+  .home.container
+    .home__title
+      h1.title Поиск форков у репозитория
+      p.subtitle Введите в поисковую строку название репозитория в формате <b>:owner/:repositoryName</b>, нажмите поиск и получите результат!
+    .home__search
+      search-panel(
         @request-completed="showResults"
         @on-error="showResults"
-      ></search-panel>
-    </div>
-  </div>
+      )
 </template>
 
 <script>
