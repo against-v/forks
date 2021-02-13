@@ -12,6 +12,7 @@
 
 <script>
 import SearchPanel from "@/components/search-panel";
+import {DEFAULT_PAGE_NUM} from "../constants";
 export default {
   name: "Home",
   components: {SearchPanel},
@@ -20,7 +21,7 @@ export default {
       this.$router.push({
         name: "Results",
         query: {
-          page: 1,
+          page: DEFAULT_PAGE_NUM,
           forksCount: String(this.$store.getters.forksCount),
           repo: String(this.$store.getters.repoName),
           owner: String(this.$store.getters.ownerLogin),
