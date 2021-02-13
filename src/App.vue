@@ -1,18 +1,12 @@
 <template lang="pug">
-  #app.test test
-  //<div id="app">
-  //  <div class="page">
-  //    <div class="page__header">
-  //      <main-header></main-header>
-  //    </div>
-  //    <div class="page__main">
-  //      <router-view></router-view>
-  //    </div>
-  //    <div class="page__footer">
-  //      <main-footer></main-footer>
-  //    </div>
-  //  </div>
-  //</div>
+  #app
+    .page
+      .page__header
+        main-header
+      .page__main
+        router-view
+      .page__footer
+        main-footer
 </template>
 <script>
 import MainFooter from "@/components/main-footer";
