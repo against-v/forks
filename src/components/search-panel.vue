@@ -7,8 +7,7 @@
       placeholder="vuejs/vue"
       )
       button.search__button(
-        :class="{'preload':preload}"
-        :disabled="preload || !isValid"
+        :disabled="!isValid"
         :title="buttonTitle"
         @click.prevent="onClickButton"
       ) Найти
@@ -20,7 +19,6 @@ export default {
   data() {
     return {
       value: "",
-      preload: false,
     };
   },
   props: {
@@ -42,19 +40,7 @@ export default {
   },
   methods: {
     onClickButton() {
-      this.preload = true;
-
-      this.$store.commit("setSearchRequest", this.value);
-
-      this.getData();
-    },
-    async getData() {
-      await this.$store.dispatch("getRepo", {
-        owner: this.values[0],
-        repo: this.values[1],
-      });
-      this.preload = false;
-      this.$emit("request-completed");
+      this.$emit("request-completed", ...this.values);
     },
   },
   created() {

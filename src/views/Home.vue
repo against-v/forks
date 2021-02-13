@@ -6,25 +6,21 @@
     .home__search
       search-panel(
         @request-completed="showResults"
-        @on-error="showResults"
       )
 </template>
 
 <script>
 import SearchPanel from "@/components/search-panel";
-import {DEFAULT_PAGE_NUM} from "../constants";
 export default {
   name: "Home",
   components: {SearchPanel},
   methods: {
-    showResults() {
+    showResults(owner, repo) {
       this.$router.push({
         name: "Results",
         query: {
-          page: DEFAULT_PAGE_NUM,
-          forksCount: String(this.$store.getters.forksCount),
-          repo: String(this.$store.getters.repoName),
-          owner: String(this.$store.getters.ownerLogin),
+          owner: owner,
+          repo: repo,
         },
       });
     },
