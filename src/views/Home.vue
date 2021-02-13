@@ -5,7 +5,7 @@
       p.subtitle Введите в поисковую строку название репозитория в формате <b>:owner/:repositoryName</b>, нажмите поиск и получите результат!
     .home__search
       search-panel(
-        @request-completed="showResults"
+        @on-search="showResults"
       )
 </template>
 

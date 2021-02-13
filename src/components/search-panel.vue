@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     onClickButton() {
-      this.$emit("request-completed", ...this.values);
+      this.$emit("on-search", ...this.values);
     },
   },
   created() {

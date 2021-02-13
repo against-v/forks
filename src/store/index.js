@@ -9,7 +9,6 @@ export default new Vuex.Store({
     repo: null,
     forks: [],
     favList: JSON.parse(localStorage.getItem("favList")) || [],
-    searchRequest: "",
   },
   mutations: {
     setRepo(state, payload) {
@@ -33,16 +32,11 @@ export default new Vuex.Store({
     clearForks(state) {
       state.forks = [];
     },
-    setSearchRequest(state, payload) {
-      state.searchRequest = payload;
-    },
   },
   actions: {
     getRepo({commit}, payload) {
       return api.get(`repos/${payload.owner}/${payload.repo}`, {params: payload}).then(res => {
         commit("setRepo", res.data);
-      }).catch(() => {
-        commit("setRepo", null);
       });
     },
     getForks({commit}, payload) {
@@ -61,22 +55,19 @@ export default new Vuex.Store({
   },
   getters: {
     repoName: (state) => {
-      return state.repo?.name || null;
+      return String(state.repo?.name);
     },
     ownerLogin: (state) => {
-      return state.repo?.owner.login || null;
+      return String(state.repo?.owner.login);
     },
     forksCount: (state) => {
-      return state.repo?.forks_count || null;
+      return state.repo?.forks_count || 0;
     },
     forks: (state) => {
       return state.forks;
     },
     favList: (state) => {
       return state.favList;
-    },
-    searchRequest: (state) => {
-      return state.searchRequest;
     },
   },
 });

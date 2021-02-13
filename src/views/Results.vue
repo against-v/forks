@@ -1,73 +1,73 @@
-<template>
-  <div class="results-page container">
-    <div
-      class="results-page__preloader"
+<template lang="pug">
+  .results.container
+    .results__preloader(
       v-show="showPreload"
-    ></div>
-    <div class="results-page__search">
-      <search-panel
-      :preset-value="searchValue"
-      @on-error="showError"
-      @request-completed="showResults"
-      ></search-panel>
-    </div>
-    <div class="results-page__content results">
-      <p
-        v-if="!tableData.length"
-        class="results__message"
-        :class="{'error' : error}"
-      >{{message}}</p>
-      <div
+    )
+    .results__search
+      search-panel(
+        :preset-value="searchValue"
+        @on-search="onSearch"
+      )
+    .results__content
+      .results__table(
         v-if="tableData.length"
-        class="results__table"
-      >
-        <results-table :data="tableData"></results-table>
-      </div>
-      <div class="results__pagination">
-        <paginate
-          v-if="tableData.length && pageCount > 0"
-          v-model="pageNum"
-          :page-count="pageCount"
-          :click-handler="changePage"
-          :prev-text="'Предыдущая страница'"
-          :next-text="'Следующая страница'"
-          :container-class="'paginator'"
-        ></paginate>
-      </div>
-    </div>
+      )
+        results-table(
+          :data="tableData"
+        )
+      p.results__message(
+        v-else
+      ) Ничего не найдено!
 
-  </div>
+    .results__pagination(
+      v-if="tableData.length && pageCount > 1"
+    )
+      paginate(
+        v-model="pageNum"
+        :page-count="pageCount"
+        :click-handler="changePage"
+        :prev-text="'Предыдущая страница'"
+        :next-text="'Следующая страница'"
+        :container-class="'paginator'"
+      )
 </template>
 
 <script>
 import Paginate from "vuejs-paginate";
 import SearchPanel from "@/components/search-panel";
 import ResultsTable from "@/components/results-table";
+import {DEFAULT_PAGE_NUM, PER_PAGE} from "@/const";
+
 export default {
   name: "Results",
   components: {ResultsTable, SearchPanel, Paginate},
   data() {
     return {
-      perPage: 10,
-      pageCount: 0,
       pageNum: 1,
       searchValue: "",
       showPreload: true,
       emptyMessage: "Ничего не найдено!",
-      message: "",
-      error: false,
-      query: null,
     };
   },
   computed: {
+    owner() {
+      return this.$route.query.owner;
+    },
+    repo() {
+      return this.$route.query.repo;
+    },
+    forksCount() {
+      return this.$store.getters.forksCount;
+    },
+    pageCount() {
+      return this.forksCount / PER_PAGE;
+    },
+
     forks() {
       return this.$store.getters.forks;
     },
     favList() {
       return this.$store.getters.favList;
-    },
-    searchRequest() {
-      return this.$store.getters.searchRequest;
     },
     tableData() {
       return this.forks.map((item) => {
@@ -85,69 +85,70 @@ export default {
     },
   },
   methods: {
-    checkQuery() {
-      const requiredQueries = [
-        "forksCount",
-        "owner",
-        "page",
-        "repo",
-      ];
-      const missingQuery = requiredQueries.find((item) => !this.$route.query[item]);
-      return !missingQuery;
+    setSearchValue() {
+      const query = this.$route.query;
+      if (query.owner && query.repo) {
+        return `${query.owner}/${query.repo}`;
+      }
+      return "";
     },
-    async getData() {
-      this.$store.commit("clearForks");
+    async getRepo() {
       try {
+        await this.$store.dispatch("getRepo", {
+          owner: this.owner,
+          repo: this.repo,
+        });
+        if (this.forksCount) {
+          await this.getForks();
+        } else {
+          this.$store.commit("clearForks");
+          this.showPreload = false;
+        }
+      } catch (err) {
+        console.log(11);
+        console.log(err);
+      }
+    },
+    async getForks(pageNum = DEFAULT_PAGE_NUM) {
+      try {
+        const query = {...this.$route.query};
+        if (query.page) {
+          pageNum = query.page;
+        } else {
+          query.page = pageNum;
+          await this.$router.replace({query});
+        }
+
         await this.$store.dispatch("getForks", {
-          owner: this.$route.query.owner,
-          repo: this.$route.query.repo,
-          page: this.$route.query.page,
-          per_page: this.perPage,
+          owner: this.owner,
+          repo: this.repo,
+          page: pageNum,
+          per_page: PER_PAGE,
         });
         this.showPreload = false;
       } catch (err) {
-        this.error = true;
-        this.message = `Ошибка: ${err.message}`;
-        this.showPreload = false;
+        console.log(22);
+        console.log(err);
       }
+    },
+    async onSearch(owner, repo) {
+      await this.$router.replace({
+        query: {
+          owner,
+          repo,
+        },
+      });
+      await this.getRepo();
     },
     async changePage(pageNumber) {
       this.showPreload = true;
-      const query = {...this.$route.query};
-      query.page = pageNumber;
-      await this.$router.replace({query});
-      await this.getData();
+      await this.getForks(pageNumber);
     },
-    showError(err) {
-      this.error = true;
-      this.message = `Ошибка: ${err.message}`;
-    },
-    showResults() {
-      this.error = false;
-      this.message = this.emptyMessage;
-      this.$router.replace({
-        query: {
-          page: 1,
-          forksCount: String(this.$store.getters.forksCount),
-          repo: String(this.$store.getters.repoName),
-          owner: String(this.$store.getters.ownerLogin),
-        },
-      });
-      this.pageCount = Math.ceil(this.$route.query.forksCount / this.perPage);
-      this.pageNum = Number(this.$route.query.page);
-      this.getData();
-    },
+
   },
   created() {
-    this.message = this.emptyMessage;
-    if (this.checkQuery()) {
-      this.pageCount = Math.ceil(this.$route.query.forksCount / this.perPage);
-      this.searchValue = this.searchRequest;
-      this.pageNum = Number(this.$route.query.page);
-      this.getData();
-    } else {
-      this.$router.replace({query: null});
-    }
+    this.searchValue = this.setSearchValue();
+    this.getRepo();
   },
 };
 </script>
