@@ -134,12 +134,7 @@ export default {
       }
     },
     async getForks(page) {
-      page = String(page);
-      const query = {...this.$route.query};
-      if (query.page !== page) {
-        query.page = page;
-        await this.$router.replace({query});
-      }
+      await this.updateQueryPage(page);
       this.$store.commit("clearForks");
       try {
         await this.$store.dispatch("getForks", {
@@ -149,9 +144,23 @@ export default {
           per_page: PER_PAGE,
         });
         this.showPreload = false;
+        if (!this.forks.length) {
+          this.showError = true;
+          this.errorText = Error.PAGE;
+          await this.updateQueryPage(DEFAULT_PAGE_NUM);
+          await this.getRepo();
+        }
       } catch (err) {
         this.showPreload = false;
         this.onError(err);
+      }
+    },
+    async updateQueryPage(page) {
+      page = String(page);
+      const query = {...this.$route.query};
+      if (query.page !== page) {
+        query.page = page;
+        await this.$router.replace({query});
       }
     },
     async onSearch(owner, repo) {
