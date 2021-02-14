@@ -1,45 +1,33 @@
-<template>
-  <div class="table-wrapper">
-    <table class="table">
-      <tr class="table__tr">
-        <th class="table__th">Название</th>
-        <th class="table__th">Владелец</th>
-        <th class="table__th">Кол-во звезд</th>
-        <th class="table__th">Ссылка</th>
-        <th class="table__th">Избранное</th>
-      </tr>
-      <tr
-        class="table__tr"
+<template lang="pug">
+  .table-wrapper
+    table.table
+      tr.table__tr
+        th.table__th Название
+        th.table__th Владелец
+        th.table__th Кол-во звезд
+        th.table__th Ссылка
+        th.table__th Избранное
+      tr.table__tr(
         v-for="(item, $index) in data"
         :key="$index"
-      >
-        <td class="table__td">
-          <span>{{item.name}}</span>
-        </td>
-        <td class="table__td">
-          <span>{{item.owner}}</span>
-        </td>
-        <td class="table__td">
-          <span>{{item.stars}}</span>
-        </td>
-        <td class="table__td">
-          <a
-            class="table__link"
+      )
+        td.table__td
+          span {{item.name}}
+        td.table__td
+          span {{item.owner}}
+        td.table__td
+          span {{item.stars}}
+        td.table__td
+          a.table__link(
             :href="item.url"
-          >
-            {{item.name}}
-          </a>
-        </td>
-        <td class="table__td">
-          <button-fav
+          ) {{item.name}}
+        td.table__td
+          button-fav(
             :id="item.id"
             :preset-value="item.isFavorite"
             @change="onFavoriteChange"
-          ></button-fav>
-        </td>
-      </tr>
-    </table>
-  </div>
+          )
+
 </template>
 
 <script>
