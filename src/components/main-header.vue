@@ -1,16 +1,11 @@
-<template>
-  <header class="header">
-    <div class="header__container container">
-      <div class="header__logo">
-        <router-link
-          class="logo"
+<template lang="pug">
+  header.header
+    .header__container.container
+      .header__logo
+        router-link.logo(
           :to="{name: 'Home'}"
-        >
-          Forks
-        </router-link>
-      </div>
-    </div>
-  </header>
+        ) Forks
+
 </template>
 
 <script>

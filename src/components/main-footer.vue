@@ -1,22 +1,14 @@
-<template>
-  <footer class="footer">
-    <div class="footer__container container">
-      <div class="footer__logo">
-        <router-link
-          class="logo"
+<template lang="pug">
+  footer.footer
+    .footer__container.container
+      .footer__logo
+        router-link.logo(
           :to="{name: 'Home'}"
-        >
-          Forks
-        </router-link>
-      </div>
-      <a
-        class="footer__copyright"
+        ) Forks
+      a.footer__copyright(
         href="mailto:aleksandr.azdakhov@gmail.com"
-      >
-        aleksandr.azdakhov@gmail.com
-      </a>
-    </div>
-  </footer>
+      ) aleksandr.azdakhov@gmail.com
+
 </template>
 
 <script>
