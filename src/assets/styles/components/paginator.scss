@@ -1,6 +1,7 @@
 .paginator {
   display: flex;
   list-style: none;
+  padding: 0;
   .disabled a {
     opacity: .5;
     pointer-events: none;

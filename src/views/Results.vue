@@ -1,14 +1,14 @@
 <template lang="pug">
   .results.container
-    .results__preloader(
-      v-show="showPreload"
-    )
     .results__search
       search-panel(
         :preset-value="searchValue"
         @on-search="onSearch"
       )
     .results__content
+      .results__preloader(
+        v-show="showPreload"
+      )
       .results__table(
         v-if="tableData.length"
       )
@@ -23,7 +23,7 @@
       v-if="tableData.length && pageCount > 1"
     )
       paginate(
-        v-model="pageNum"
+        v-model="paginatorValue"
         :page-count="pageCount"
         :click-handler="changePage"
         :prev-text="'Предыдущая страница'"
@@ -43,7 +43,7 @@ export default {
   components: {ResultsTable, SearchPanel, Paginate},
   data() {
     return {
-      pageNum: 1,
+      paginatorValue: DEFAULT_PAGE_NUM,
       searchValue: "",
       showPreload: true,
       emptyMessage: "Ничего не найдено!",
@@ -56,11 +56,14 @@ export default {
     repo() {
       return this.$route.query.repo;
     },
+    page() {
+      return this.$route.query.page || String(DEFAULT_PAGE_NUM);
+    },
     forksCount() {
       return this.$store.getters.forksCount;
     },
     pageCount() {
-      return this.forksCount / PER_PAGE;
+      return Math.ceil(this.forksCount / PER_PAGE);
     },
 
     forks() {
@@ -97,41 +100,43 @@ export default {
         await this.$store.dispatch("getRepo", {
           owner: this.owner,
           repo: this.repo,
+          type: "public",
         });
         if (this.forksCount) {
-          await this.getForks();
+          this.paginatorValue = Number(this.page);
+          await this.getForks(this.page);
         } else {
           this.$store.commit("clearForks");
           this.showPreload = false;
         }
       } catch (err) {
         console.log(11);
-        console.log(err);
+        this.showPreload = false;
       }
     },
-    async getForks(pageNum = DEFAULT_PAGE_NUM) {
+    async getForks(page) {
+      page = String(page);
+      const query = {...this.$route.query};
+      if (query.page !== page) {
+        query.page = page;
+        await this.$router.replace({query});
+      }
+      this.$store.commit("clearForks");
       try {
-        const query = {...this.$route.query};
-        if (query.page) {
-          pageNum = query.page;
-        } else {
-          query.page = pageNum;
-          await this.$router.replace({query});
-        }
-
         await this.$store.dispatch("getForks", {
           owner: this.owner,
           repo: this.repo,
-          page: pageNum,
+          page: page,
           per_page: PER_PAGE,
         });
         this.showPreload = false;
       } catch (err) {
         console.log(22);
-        console.log(err);
+        this.showPreload = false;
       }
     },
     async onSearch(owner, repo) {
+      this.showPreload = true;
       await this.$router.replace({
         query: {
           owner,
@@ -140,9 +145,9 @@ export default {
       });
       await this.getRepo();
     },
-    async changePage(pageNumber) {
+    async changePage(page) {
       this.showPreload = true;
-      await this.getForks(pageNumber);
+      await this.getForks(page);
     },
 
   },
