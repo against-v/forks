@@ -1,5 +1,10 @@
 <template lang="pug">
   .results.container
+    modal(
+    v-if="showError"
+    :text="errorText"
+    @on-close="showError = false"
+    )
     .results__search
       search-panel(
         :preset-value="searchValue"
@@ -36,17 +41,20 @@
 import Paginate from "vuejs-paginate";
 import SearchPanel from "@/components/search-panel";
 import ResultsTable from "@/components/results-table";
-import {DEFAULT_PAGE_NUM, PER_PAGE} from "@/const";
+import {DEFAULT_PAGE_NUM, PER_PAGE, Error} from "@/const";
+import Modal from "@/components/modal";
 
 export default {
   name: "Results",
-  components: {ResultsTable, SearchPanel, Paginate},
+  components: {Modal, ResultsTable, SearchPanel, Paginate},
   data() {
     return {
       paginatorValue: DEFAULT_PAGE_NUM,
       searchValue: "",
       showPreload: true,
       emptyMessage: "Ничего не найдено!",
+      showError: false,
+      errorText: Error.DEFAULT,
     };
   },
   computed: {
@@ -95,6 +103,17 @@ export default {
       }
       return "";
     },
+    onError(err) {
+      const status = err.response.status;
+      if (status === 404) {
+        this.errorText = Error.NOT_FOUND;
+      } else if (status === 403) {
+        this.errorText = Error.LIMIT;
+      } else {
+        this.errorText = Error.DEFAULT;
+      }
+      this.showError = true;
+    },
     async getRepo() {
       try {
         await this.$store.dispatch("getRepo", {
@@ -110,8 +129,8 @@ export default {
           this.showPreload = false;
         }
       } catch (err) {
-        console.log(11);
         this.showPreload = false;
+        this.onError(err);
       }
     },
     async getForks(page) {
@@ -131,8 +150,8 @@ export default {
         });
         this.showPreload = false;
       } catch (err) {
-        console.log(22);
         this.showPreload = false;
+        this.onError(err);
       }
     },
     async onSearch(owner, repo) {
